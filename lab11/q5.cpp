@@ -1,44 +1,45 @@
 #include <iostream>
 #include <vector>
+#include <cstring>
+
 using namespace std;
 
-int matrix_chain(vector<int>& v) 
-{
-    int n = v.size()-1;
-    vector< vector<int> > m(n, vector<int>(n));
-    for (int i = 0; i < n; i++)
-        m[i][i] = 0;
-    for (int a = 2; a <= n; a++) 
-    {
-        for (int i = 0; i < n-a+1; i++) 
-        {
-            int j = i+a-1;
-            m[i][j] = INT_MAX;
-            for (int k = i; k < j; k++) 
-            {
-                int x = m[i][k] + m[k+1][j] + v[i]*v[k+1]*v[j+1];
-                if (x < m[i][j])
-                    m[i][j] = x;
-            }
-        }
-    }
-    return m[0][n-1];
-}
+int t[502][502];
 
-int main() 
+int solve(int arr[],int i, int j)
+{
+    if(i >= j)
+    {
+        return 0;
+    }
+    if(t[i][j]!=-1)
+    {
+        return t[i][j];
+    }
+
+    int mini=INT_MAX;
+    for(int k = i;k < j;k++)
+    {
+        int temp_ans = solve(arr,i,k) + solve(arr,k+1,j) + (arr[i-1] * arr[k] * arr[j]);
+        if(temp_ans < mini)
+            mini = temp_ans;
+    }
+    return t[i][j]=mini;
+} 
+
+
+int main()
 {
     int n;
-    cin >> n;
-    vector <int> v(n+1);
+    cin>>n;
+    int arr[n+1];
     for(int i = 0; i < n + 1; i++)
     {
-        cin >> v[i];
+        cin >> arr[i];
     }
-    int result = matrix_chain(v);
-    cout << result << endl;
-    return 0;
+    memset(t, -1, sizeof(t));
+    cout << solve(arr,1,n);
 }
-
 
 
 
