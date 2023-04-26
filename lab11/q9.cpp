@@ -1,27 +1,35 @@
 #include <iostream>
+#include <cstring>
+#include <numeric>
+
 using namespace std;
 
-int a[5005];
-int dp[5005][5005];
+int dp[1005][1005], a[1005];        
+
+int solve(int i, int j, int turn)       /*  dp stores maximum score difference that the turn'th player can get between the i-th
+                                            and j-th elements of the array on his turn */
+{
+    if (i > j)      // Base condition
+        return 0;
+    if (dp[i][j] != -1)     // Typical memoization initialization
+        return dp[i][j];
+    if (turn == 1) 
+        return dp[i][j] = max(a[i] + solve(i + 1, j, 2), a[j] + solve(i, j - 1, 2));    // Max of first & last element
+    else 
+        return dp[i][j] = min(solve(i + 1, j, 1), solve(i, j - 1, 1));  // To minimize score difference after 1st player's turn
+}
 
 int main() 
 {
     int n;
+    memset(dp, -1, sizeof(dp));
     cin >> n;
-    for (int i = 1; i < n + 1; i++) 
+    for (int i = 0; i < n; i++) 
     {
         cin >> a[i];
-        dp[i][i] = a[i];
     }
-
-    for (int len = 2; len < n + 1; len++) 
-    {
-        for (int i = 1; i <= n-len+1; i++) 
-        {
-            int j = i+len-1;
-            dp[i][j] = max(a[i] - dp[i+1][j], a[j] - dp[i][j-1]);
-        }
-    }
-    cout << dp[1][n] << endl;
+    int ans = solve(0, n - 1, 1);
+    int sum = accumulate(a, a + n, 0);
+    cout << 2 * ans - sum << endl;
     return 0;
 }
